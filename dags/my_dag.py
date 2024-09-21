@@ -1,13 +1,18 @@
 from airflow import DAG
+from airflow.models import Variable
 from airflow.operators.python import PythonOperator
 from datetime import datetime
 
+# we can use ti for the task instance
+def print_a(ti):
+    print(f"Hello from task_a")
+    ti.xcom_push(key='aval', value='001')
 
-def print_a():
-    print("Hello from task_a")
-
-def print_b():
-    print("Hello from task_b")
+# or we can use kwargs
+def print_b(**kwargs):
+    aval = kwargs['ti'].xcom_pull(key='aval',task_ids='task_a')
+    val = Variable.get('API_URL')
+    return val + aval
 
 # Set default params for all tasks in a DAG
 default_args = {
